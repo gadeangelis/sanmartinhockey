@@ -15,16 +15,14 @@ import { PendingApprovalScreen } from './components/PendingApprovalScreen';
 import { SupabaseSettingsModal } from './components/SupabaseSettingsModal';
 import { ImageViewerModal } from './components/ImageViewerModal';
 
-import { clubApi, isSupabaseConfigured } from './lib/supabase';
+import { clubApi, isSupabaseConfigured, supabase } from './lib/supabase';
 import { DEFAULT_ADMIN_USER } from './lib/mockData';
 import { exportToExcel, exportToPdf } from './lib/exportUtils';
 
 export function App() {
-  // Estado de Autenticación
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('hc_current_user');
-    return saved ? JSON.parse(saved) : DEFAULT_ADMIN_USER;
-  });
+  // Estado de Autenticación - Por defecto null (requiere Login obligatorio)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Estado de Navegación
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -41,7 +39,143 @@ export function App() {
   const [sponsors, setSponsors] = useState([]);
   const [gastos, setGastos] = useState([]);
 
-  // Cargar datos
+  // Resuelve el perfil del usuario de Supabase Auth
+  const resolveProfileForUser = async (sessionUser) => {
+    if (!sessionUser) return null;
+    const cleanEmail = (sessionUser.email || '').trim().toLowerCase();
+
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        // 1. Buscar en la tabla profiles por UUID de Auth
+        const { data: profileById } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', sessionUser.id)
+          .maybeSingle();
+
+        if (profileById) return profileById;
+
+        // 2. Si no coincide el ID, buscar por email
+        if (cleanEmail) {
+          const { data: profileByEmail } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', cleanEmail)
+            .maybeSingle();
+
+          if (profileByEmail) return profileByEmail;
+        }
+
+        // 3. Crear fila en profiles si es un nuevo ingreso
+        const newProfile = {
+          id: sessionUser.id,
+          email: cleanEmail,
+          full_name: sessionUser.user_metadata?.full_name || sessionUser.user_metadata?.name || cleanEmail.split('@')[0] || 'Usuario',
+          role: sessionUser.user_metadata?.role || 'padre',
+          status: sessionUser.user_metadata?.role === 'admin' ? 'approved' : 'pending',
+          created_at: new Date().toISOString()
+        };
+
+        const { data: createdProfile } = await supabase
+          .from('profiles')
+          .insert([newProfile])
+          .select()
+          .maybeSingle();
+
+        return createdProfile || newProfile;
+      }
+    } catch (err) {
+      console.warn('Error resolviendo perfil en Supabase:', err);
+    }
+
+    return {
+      id: sessionUser.id,
+      email: cleanEmail,
+      full_name: sessionUser.user_metadata?.full_name || cleanEmail.split('@')[0] || 'Usuario',
+      role: sessionUser.user_metadata?.role || 'padre',
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+  };
+
+  // 1. Verificación inicial de sesión con getSession() y listener onAuthStateChange()
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        if (isSupabaseConfigured() && supabase) {
+          const { data: { session }, error } = await supabase.auth.getSession();
+          if (error) {
+            console.warn('Error al obtener sesión en Supabase:', error);
+          }
+
+          if (session?.user && isMounted) {
+            const profile = await resolveProfileForUser(session.user);
+            if (isMounted && profile) {
+              setCurrentUser(profile);
+              localStorage.setItem('hc_current_user', JSON.stringify(profile));
+            }
+          } else if (isMounted) {
+            // Sin sesión activa -> Obligar pantalla de Login
+            setCurrentUser(null);
+            localStorage.removeItem('hc_current_user');
+          }
+        } else {
+          // Si Supabase no está conectado, verificar si había un usuario demo guardado
+          const saved = localStorage.getItem('hc_current_user');
+          if (saved && isMounted) {
+            try {
+              setCurrentUser(JSON.parse(saved));
+            } catch (e) {
+              setCurrentUser(null);
+            }
+          } else if (isMounted) {
+            setCurrentUser(null);
+          }
+        }
+      } catch (err) {
+        console.error('Error inicializando autenticación:', err);
+        if (isMounted) setCurrentUser(null);
+      } finally {
+        if (isMounted) setAuthLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Listener reactivo a cambios de sesión de Supabase
+    let authSubscription = null;
+    if (isSupabaseConfigured() && supabase) {
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!isMounted) return;
+
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          if (session?.user) {
+            const profile = await resolveProfileForUser(session.user);
+            if (isMounted && profile) {
+              setCurrentUser(profile);
+              localStorage.setItem('hc_current_user', JSON.stringify(profile));
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          if (isMounted) {
+            setCurrentUser(null);
+            localStorage.removeItem('hc_current_user');
+            setActiveTab('dashboard');
+          }
+        }
+      });
+      authSubscription = data?.subscription;
+    }
+
+    return () => {
+      isMounted = false;
+      if (authSubscription) authSubscription.unsubscribe();
+    };
+  }, []);
+
+  // Cargar datos solo cuando el usuario está autenticado y aprobado
   const loadAllData = async () => {
     try {
       const [profs, ents, cants, sps, gsts] = await Promise.all([
@@ -60,7 +194,7 @@ export function App() {
 
       // Si el usuario actual está en la lista de perfiles, sincronizar su estado
       if (currentUser) {
-        const found = profs.find(p => p.id === currentUser.id);
+        const found = profs.find(p => p.id === currentUser.id || p.email?.toLowerCase() === currentUser.email?.toLowerCase());
         if (found) {
           setCurrentUser(found);
           localStorage.setItem('hc_current_user', JSON.stringify(found));
@@ -72,18 +206,30 @@ export function App() {
   };
 
   useEffect(() => {
-    loadAllData();
-  }, []);
+    if (currentUser && currentUser.status === 'approved') {
+      loadAllData();
+    }
+  }, [currentUser?.id, currentUser?.status]);
 
-  // Guardar usuario en LocalStorage
+  // Guardar usuario al autenticarse con éxito
   const handleLoginSuccess = (user) => {
     setCurrentUser(user);
     localStorage.setItem('hc_current_user', JSON.stringify(user));
   };
 
-  const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('hc_current_user');
+  // Cerrar Sesión: desloguea de Supabase, limpia caché y vuelve a la pantalla de login
+  const handleLogout = async () => {
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (err) {
+      console.warn('Error al cerrar sesión en Supabase:', err);
+    } finally {
+      setCurrentUser(null);
+      localStorage.removeItem('hc_current_user');
+      setActiveTab('dashboard');
+    }
   };
 
   const handleSwitchUser = (demoUser) => {
@@ -273,7 +419,54 @@ export function App() {
     setPreviewImage({ isOpen: true, url, title });
   };
 
-  // Si no hay usuario logueado -> Pantalla de Inicio / Registro
+  // 1. Pantalla de carga mientras se verifica la sesión en Supabase
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'radial-gradient(ellipse at center top, #1e2430 0%, #0b0e12 100%)',
+        color: '#ffffff',
+        gap: '16px'
+      }}>
+        <div style={{
+          width: '74px',
+          height: '74px',
+          borderRadius: '20px',
+          background: '#ffffff',
+          padding: '3px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 10px 30px rgba(229, 37, 42, 0.45)',
+          marginBottom: '6px'
+        }}>
+          <img 
+            src="/escudo.jpg" 
+            alt="San Martín" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '17px' }} 
+          />
+        </div>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid rgba(229, 37, 42, 0.2)',
+          borderTopColor: 'var(--club-red, #e5252a)',
+          borderRadius: '50%',
+          animation: 'spinAuth 0.8s linear infinite'
+        }} />
+        <style>{`@keyframes spinAuth { to { transform: rotate(360deg); } }`}</style>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary, #94a3b8)', fontWeight: 600 }}>
+          Verificando sesión...
+        </span>
+      </div>
+    );
+  }
+
+  // 2. Si no hay usuario logueado -> Pantalla de Inicio / Registro OBLIGATORIA (bloqueo total)
   if (!currentUser) {
     return <AuthModal onLoginSuccess={handleLoginSuccess} />;
   }

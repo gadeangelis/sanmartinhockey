@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Shield, Sparkles, Check, AlertCircle } from 'lucide-react';
+import { LogIn, UserPlus, Shield, Sparkles, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { DEMO_ROLES, DEFAULT_ADMIN_USER } from '../lib/mockData';
-import { getLocalData, setLocalData } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, getLocalData, setLocalData } from '../lib/supabase';
 
 export const AuthModal = ({ onLoginSuccess }) => {
   const [isRegister, setIsRegister] = useState(false);
@@ -10,23 +10,112 @@ export const AuthModal = ({ onLoginSuccess }) => {
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState('padre'); // 'padre' o 'delegado' por defecto
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setIsSubmitting(true);
 
-    const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER]);
-    const found = profiles.find(p => p.email.toLowerCase() === email.trim().toLowerCase());
+    const cleanEmail = email.trim().toLowerCase();
 
-    if (!found) {
-      setErrorMsg('No se encontró ninguna cuenta registrada con este correo electrónico.');
-      return;
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        // 1. Intentar inicio de sesión mediante Supabase Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: password
+        });
+
+        if (!error && data?.user) {
+          // Buscar perfil en tabla 'profiles'
+          let foundProfile = null;
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .maybeSingle();
+
+            if (profile) {
+              foundProfile = profile;
+            } else {
+              const { data: profileByEmail } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('email', cleanEmail)
+                .maybeSingle();
+
+              if (profileByEmail) foundProfile = profileByEmail;
+            }
+          } catch (pErr) {
+            console.warn('Error consultando tabla profiles:', pErr);
+          }
+
+          if (!foundProfile) {
+            foundProfile = {
+              id: data.user.id,
+              email: cleanEmail,
+              full_name: data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+              role: data.user.user_metadata?.role || 'padre',
+              status: 'pending',
+              created_at: new Date().toISOString()
+            };
+            try {
+              await supabase.from('profiles').insert([foundProfile]);
+            } catch (insErr) {
+              console.warn('Error creando perfil en tabla:', insErr);
+            }
+          }
+
+          onLoginSuccess(foundProfile);
+          return;
+        }
+
+        // 2. Si falló Supabase Auth (ej. usuario demo para evaluación rápida)
+        const demoProfiles = [DEFAULT_ADMIN_USER, ...DEMO_ROLES];
+        const demoFound = demoProfiles.find(p => p.email.toLowerCase() === cleanEmail);
+        if (demoFound) {
+          onLoginSuccess(demoFound);
+          return;
+        }
+
+        const localProfiles = getLocalData('hc_profiles', []);
+        const localFound = localProfiles.find(p => p.email.toLowerCase() === cleanEmail);
+        if (localFound) {
+          onLoginSuccess(localFound);
+          return;
+        }
+
+        // Traducir o formatear mensaje de error de Supabase
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            setErrorMsg('Credenciales inválidas. Verifica tu correo y contraseña.');
+          } else {
+            setErrorMsg(error.message);
+          }
+          return;
+        }
+      }
+
+      // 3. Fallback modo local (sin Supabase conectado)
+      const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER, ...DEMO_ROLES]);
+      const found = profiles.find(p => p.email.toLowerCase() === cleanEmail);
+
+      if (!found) {
+        setErrorMsg('No se encontró ninguna cuenta registrada con este correo electrónico.');
+        return;
+      }
+
+      onLoginSuccess(found);
+    } catch (err) {
+      setErrorMsg('Error al iniciar sesión: ' + (err.message || 'Error inesperado'));
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onLoginSuccess(found);
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -35,33 +124,84 @@ export const AuthModal = ({ onLoginSuccess }) => {
       return;
     }
 
-    const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER]);
-    const exists = profiles.some(p => p.email.toLowerCase() === email.trim().toLowerCase());
+    setIsSubmitting(true);
+    const cleanEmail = email.trim().toLowerCase();
 
-    if (exists) {
-      setErrorMsg('Este correo ya se encuentra registrado en el sistema.');
-      return;
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password: password,
+          options: {
+            data: {
+              full_name: fullName.trim(),
+              role: role
+            }
+          }
+        });
+
+        if (error) {
+          setErrorMsg('Error en el registro: ' + error.message);
+          return;
+        }
+
+        const newProfile = {
+          id: data.user?.id || crypto.randomUUID(),
+          email: cleanEmail,
+          full_name: fullName.trim(),
+          role: role,
+          status: 'pending', // Requiere aprobación del administrador
+          created_at: new Date().toISOString()
+        };
+
+        try {
+          await supabase.from('profiles').insert([newProfile]);
+        } catch (dbErr) {
+          console.warn('Error insertando en profiles de Supabase:', dbErr);
+        }
+
+        const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER]);
+        setLocalData('hc_profiles', [newProfile, ...profiles]);
+
+        onLoginSuccess(newProfile);
+        return;
+      }
+
+      // Modo local
+      const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER]);
+      const exists = profiles.some(p => p.email.toLowerCase() === cleanEmail);
+
+      if (exists) {
+        setErrorMsg('Este correo ya se encuentra registrado en el sistema.');
+        return;
+      }
+
+      const newProfile = {
+        id: 'usr-' + Date.now(),
+        email: cleanEmail,
+        full_name: fullName.trim(),
+        role: role,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
+      const updated = [newProfile, ...profiles];
+      setLocalData('hc_profiles', updated);
+      onLoginSuccess(newProfile);
+    } catch (err) {
+      setErrorMsg('Error al registrar usuario: ' + (err.message || 'Error inesperado'));
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const newProfile = {
-      id: 'usr-' + Date.now(),
-      email: email.trim(),
-      full_name: fullName.trim(),
-      role: role, // 'padre' o 'delegado'
-      status: 'pending', // CRÍTICO: Estado pendiente de aprobación por el Admin
-      created_at: new Date().toISOString()
-    };
-
-    const updated = [newProfile, ...profiles];
-    setLocalData('hc_profiles', updated);
-
-    // Ingresar al estado pendiente
-    onLoginSuccess(newProfile);
   };
 
   const handleGoogleLogin = async () => {
     try {
       setErrorMsg('');
+      if (!isSupabaseConfigured() || !supabase) {
+        setErrorMsg('Supabase no está configurado. Conecta tu proyecto en la configuración.');
+        return;
+      }
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -299,10 +439,27 @@ export const AuthModal = ({ onLoginSuccess }) => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '12px', marginTop: '6px', fontSize: '0.9rem' }}
+            disabled={isSubmitting}
+            style={{ 
+              width: '100%', 
+              padding: '12px', 
+              marginTop: '6px', 
+              fontSize: '0.9rem',
+              opacity: isSubmitting ? 0.75 : 1,
+              cursor: isSubmitting ? 'not-allowed' : 'pointer'
+            }}
           >
-            {isRegister ? <UserPlus size={18} /> : <LogIn size={18} />}
-            {isRegister ? 'Solicitar Registro' : 'Ingresar al Sistema'}
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Procesando...</span>
+              </>
+            ) : (
+              <>
+                {isRegister ? <UserPlus size={18} /> : <LogIn size={18} />}
+                <span>{isRegister ? 'Solicitar Registro' : 'Ingresar al Sistema'}</span>
+              </>
+            )}
           </button>
         </form>
 
