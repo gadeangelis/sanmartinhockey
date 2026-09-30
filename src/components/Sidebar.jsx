@@ -71,7 +71,7 @@ export const Sidebar = ({
         {/* Cabecera del Club */}
         <div className="sidebar-header">
           <img 
-            src="/escudo.png" 
+            src="/escudo-sanmartin.png" 
             alt="Escudo San Martín" 
             className="brand-logo-img"
           />

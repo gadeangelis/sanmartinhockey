@@ -452,7 +452,7 @@ export function App() {
           marginBottom: '6px'
         }}>
           <img 
-            src="/escudo.png" 
+            src="/escudo-sanmartin.png" 
             alt="San Martín" 
             style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '17px' }} 
           />

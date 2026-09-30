@@ -49,7 +49,7 @@ export const Navbar = ({
         {/* Escudo y Breadcrumbs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img
-            src="/escudo.png"
+            src="/escudo-sanmartin.png"
             alt="Escudo San Martín"
             style={{
               width: '32px',

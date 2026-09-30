@@ -246,7 +246,7 @@ export const AuthModal = ({ onLoginSuccess }) => {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ position: 'relative', display: 'inline-block', marginBottom: '14px' }}>
             <img
-              src="/escudo.png"
+              src="/escudo-sanmartin.png"
               alt="Escudo San Martín"
               style={{
                 width: '90px',
