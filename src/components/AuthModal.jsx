@@ -59,21 +59,23 @@ export const AuthModal = ({ onLoginSuccess }) => {
     onLoginSuccess(newProfile);
   };
 
-  const handleGoogleLogin = () => {
-    // Simular o iniciar autenticación Google
-    const demoGoogleUser = {
-      id: 'usr-google-' + Date.now(),
-      email: 'usuario.google@hockeysanmartin.com',
-      full_name: 'Usuario Google',
-      role: 'padre',
-      status: 'pending', // Requiere aprobación
-      created_at: new Date().toISOString()
-    };
+  const handleGoogleLogin = async () => {
+    try {
+      setErrorMsg('');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
 
-    const profiles = getLocalData('hc_profiles', [DEFAULT_ADMIN_USER]);
-    const updated = [demoGoogleUser, ...profiles];
-    setLocalData('hc_profiles', updated);
-    onLoginSuccess(demoGoogleUser);
+      if (error) {
+        setErrorMsg('Error al iniciar sesión con Google: ' + error.message);
+      }
+    } catch (err) {
+      setErrorMsg('Ocurrió un error inesperado al conectar con Google.');
+      console.error(err);
+    }
   };
 
   // Selector directo de usuarios de prueba para evaluar los 4 roles
