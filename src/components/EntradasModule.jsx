@@ -62,8 +62,8 @@ export const EntradasModule = ({ entradas, currentUser, onAddEntrada, onDeleteEn
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Permisos según el rol
-  const canCreate = ['delegado', 'tesorero', 'admin'].includes(currentUser?.role);
+  // Permisos según el rol (Tesorero y Admin pueden crear/eliminar; Delegado y Padre son Solo Lectura)
+  const canCreate = ['tesorero', 'admin'].includes(currentUser?.role);
   const canDelete = ['tesorero', 'admin'].includes(currentUser?.role);
 
   // Actualizar un campo de un talonario específico
@@ -281,7 +281,7 @@ export const EntradasModule = ({ entradas, currentUser, onAddEntrada, onDeleteEn
             background: 'rgba(255,255,255,0.06)',
             color: 'var(--text-secondary)'
           }}>
-            👀 Modo Solo Lectura (Padres)
+            👀 Modo Solo Lectura
           </div>
         )}
       </div>

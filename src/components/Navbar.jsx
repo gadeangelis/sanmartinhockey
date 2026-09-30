@@ -31,7 +31,7 @@ export const Navbar = ({
       case 'tesorero':
         return { bg: 'rgba(16, 185, 129, 0.2)', color: 'var(--color-success)', border: '1px solid rgba(16, 185, 129, 0.4)', label: 'TESORERO' };
       case 'delegado':
-        return { bg: 'rgba(56, 189, 248, 0.2)', color: 'var(--color-info)', border: '1px solid rgba(56, 189, 248, 0.4)', label: 'DELEGADO' };
+        return { bg: 'rgba(56, 189, 248, 0.2)', color: 'var(--color-info)', border: '1px solid rgba(56, 189, 248, 0.4)', label: 'DELEGADO (SOLO LECTURA)' };
       default:
         return { bg: 'rgba(148, 163, 184, 0.2)', color: 'var(--text-secondary)', border: '1px solid rgba(148, 163, 184, 0.4)', label: 'PADRE (SOLO LECTURA)' };
     }

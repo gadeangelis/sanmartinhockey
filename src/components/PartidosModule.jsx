@@ -780,7 +780,7 @@ export const PartidosModule = ({ entradas, cantina, gastos, currentUser, onAddGa
   const [selectedPartido, setSelectedPartido] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const canManage = ['tesorero', 'admin', 'delegado'].includes(currentUser?.role);
+  const canManage = ['tesorero', 'admin'].includes(currentUser?.role);
 
   const partidos = useMemo(
     () => buildPartidos(entradas, cantina, gastos),

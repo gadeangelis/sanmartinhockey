@@ -29,7 +29,7 @@ export const DEMO_ROLES = [
   {
     id: 'usr-delegado-principal',
     email: 'delegado@hockeysanmartin.com',
-    full_name: 'Martín Delegado',
+    full_name: 'Martín Delegado (Solo Lectura)',
     role: 'delegado',
     status: 'approved',
     created_at: new Date().toISOString()

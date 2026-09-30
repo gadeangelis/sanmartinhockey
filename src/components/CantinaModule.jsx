@@ -33,8 +33,8 @@ export const CantinaModule = ({ cantina, currentUser, onAddCantina, onDeleteCant
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Permisos
-  const canCreate = ['delegado', 'tesorero', 'admin'].includes(currentUser?.role);
+  // Permisos (Tesorero y Admin pueden crear/eliminar; Delegado y Padre son Solo Lectura)
+  const canCreate = ['tesorero', 'admin'].includes(currentUser?.role);
   const canDelete = ['tesorero', 'admin'].includes(currentUser?.role);
 
   // Carga rápida de totales
@@ -151,7 +151,7 @@ export const CantinaModule = ({ cantina, currentUser, onAddCantina, onDeleteCant
             background: 'rgba(255,255,255,0.06)',
             color: 'var(--text-secondary)'
           }}>
-            👀 Modo Solo Lectura (Padres)
+            👀 Modo Solo Lectura
           </div>
         )}
       </div>

@@ -416,7 +416,7 @@ export const AuthModal = ({ onLoginSuccess }) => {
                 >
                   <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>DELEGADO</div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Carga Entradas & Cantina
+                    Visualización integral (Solo Lectura)
                   </div>
                 </button>
               </div>

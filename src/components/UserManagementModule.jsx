@@ -283,7 +283,7 @@ export const UserManagementModule = ({ profiles, onApproveUser, onRejectUser, on
                     <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                       {u.role === 'admin' && 'Control total, aprobación de usuarios y borrado'}
                       {u.role === 'tesorero' && 'Carga total, sponsors, gastos y borrado de errores'}
-                      {u.role === 'delegado' && 'Carga y edición de Entradas y Cantina'}
+                      {u.role === 'delegado' && 'Visualización completa de todos los módulos (Solo Lectura)'}
                       {u.role === 'padre' && 'Solo lectura de informes y gráficos'}
                     </span>
                   </td>
@@ -295,7 +295,7 @@ export const UserManagementModule = ({ profiles, onApproveUser, onRejectUser, on
                       onChange={e => onUpdateRole(u.id, e.target.value)}
                     >
                       <option value="padre">Padre (Solo Lectura)</option>
-                      <option value="delegado">Delegado (Entradas/Cantina)</option>
+                      <option value="delegado">Delegado (Solo Lectura Completo)</option>
                       <option value="tesorero">Tesorero (Financiero)</option>
                       <option value="admin">Administrador (Total)</option>
                     </select>

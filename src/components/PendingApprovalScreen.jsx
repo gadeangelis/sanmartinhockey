@@ -107,7 +107,7 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
               color: 'var(--club-red)', 
               textTransform: 'uppercase' 
             }}>
-              {currentUser?.role === 'padre' ? 'PADRE (Solo Lectura)' : 'DELEGADO (Entradas / Cantina)'}
+              {currentUser?.role === 'padre' ? 'PADRE (Solo Lectura Partidos)' : 'DELEGADO (Solo Lectura Completo)'}
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
