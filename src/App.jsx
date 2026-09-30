@@ -211,6 +211,13 @@ export function App() {
     }
   }, [currentUser?.id, currentUser?.status]);
 
+  // Restricción de navegación estricta: el rol padre solo puede acceder a 'dashboard' y 'partidos'
+  useEffect(() => {
+    if (currentUser?.role === 'padre' && !['dashboard', 'partidos'].includes(activeTab)) {
+      setActiveTab('dashboard');
+    }
+  }, [currentUser?.role, activeTab]);
+
   // Guardar usuario al autenticarse con éxito
   const handleLoginSuccess = (user) => {
     setCurrentUser(user);
@@ -540,10 +547,11 @@ export function App() {
               onExportExcel={handleExportExcel}
               onExportPdf={handleExportPdf}
               onNavigateToModule={setActiveTab}
+              currentUser={currentUser}
             />
           )}
 
-          {activeTab === 'entradas' && (
+          {activeTab === 'entradas' && currentUser?.role !== 'padre' && (
             <EntradasModule 
               entradas={entradas}
               currentUser={currentUser}
@@ -553,7 +561,7 @@ export function App() {
             />
           )}
 
-          {activeTab === 'cantina' && (
+          {activeTab === 'cantina' && currentUser?.role !== 'padre' && (
             <CantinaModule 
               cantina={cantina}
               currentUser={currentUser}
@@ -563,7 +571,7 @@ export function App() {
             />
           )}
 
-          {activeTab === 'gastos_partido' && (
+          {activeTab === 'gastos_partido' && currentUser?.role !== 'padre' && (
             <GastosPartidoModule 
               gastos={gastos}
               currentUser={currentUser}
@@ -573,7 +581,7 @@ export function App() {
             />
           )}
 
-          {activeTab === 'sponsors' && (
+          {activeTab === 'sponsors' && currentUser?.role !== 'padre' && (
             <SponsorsModule 
               sponsors={sponsors}
               currentUser={currentUser}
@@ -582,14 +590,14 @@ export function App() {
             />
           )}
 
-          {activeTab === 'rendicion' && (
+          {activeTab === 'rendicion' && currentUser?.role !== 'padre' && (
             <RendicionClubModule 
               rendiciones={rendiciones}
               onExportExcel={handleExportExcel}
             />
           )}
 
-          {activeTab === 'gastos' && (
+          {activeTab === 'gastos' && currentUser?.role !== 'padre' && (
             <GastosModule 
               gastos={gastos}
               fondoSponsors={balanceData.fondoSponsors}
@@ -612,7 +620,7 @@ export function App() {
             />
           )}
 
-          {activeTab === 'usuarios' && (
+          {activeTab === 'usuarios' && currentUser?.role === 'admin' && (
             <UserManagementModule 
               profiles={profiles}
               onApproveUser={handleApproveUser}

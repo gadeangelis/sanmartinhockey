@@ -22,8 +22,11 @@ export const Dashboard = ({
   rendiciones,
   onExportExcel,
   onExportPdf,
-  onNavigateToModule
+  onNavigateToModule,
+  currentUser
 }) => {
+  const isPadre = currentUser?.role === 'padre';
+
   // Mes actual del sistema (dinámico, centralizado en exportUtils)
   const currentSystemMonth = getCurrentSystemMonth();
 
@@ -150,6 +153,7 @@ export const Dashboard = ({
 
   // Exportación filtrada por mes seleccionado
   const handleExportExcelFiltered = () => {
+    if (isPadre) return;
     const entMes = entradas.filter(e => getRecordMonth(e) === selectedMonth);
     const canMes = cantina.filter(c => getRecordMonth(c) === selectedMonth);
     const spoMes = sponsors.filter(s => getRecordMonth(s) === selectedMonth);
@@ -175,6 +179,7 @@ export const Dashboard = ({
   };
 
   const handleExportPdfFiltered = () => {
+    if (isPadre) return;
     const entMes = entradas.filter(e => getRecordMonth(e) === selectedMonth);
     const canMes = cantina.filter(c => getRecordMonth(c) === selectedMonth);
     const spoMes = sponsors.filter(s => getRecordMonth(s) === selectedMonth);
@@ -309,14 +314,18 @@ export const Dashboard = ({
             )}
           </div>
 
-          <button className="btn btn-secondary" onClick={handleExportExcelFiltered}>
-            <FileSpreadsheet size={16} color="var(--color-success)" />
-            <span>Descargar Excel</span>
-          </button>
-          <button className="btn btn-primary" onClick={handleExportPdfFiltered}>
-            <FileText size={16} />
-            <span>Descargar Informe PDF</span>
-          </button>
+          {!isPadre && (
+            <>
+              <button className="btn btn-secondary" onClick={handleExportExcelFiltered}>
+                <FileSpreadsheet size={16} color="var(--color-success)" />
+                <span>Descargar Excel</span>
+              </button>
+              <button className="btn btn-primary" onClick={handleExportPdfFiltered}>
+                <FileText size={16} />
+                <span>Descargar Informe PDF</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 

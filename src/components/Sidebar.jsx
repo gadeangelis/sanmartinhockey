@@ -25,8 +25,9 @@ export const Sidebar = ({
   onLogout 
 }) => {
   const isAdmin = currentUser?.role === 'admin';
+  const isPadre = currentUser?.role === 'padre';
 
-  const menuItems = [
+  let menuItems = [
     { id: 'dashboard', label: 'Tablero General', icon: LayoutGrid, section: 'PANEL PRINCIPAL' },
     { id: 'entradas', label: 'Entradas', icon: Ticket, section: 'MÓDULOS OPERATIVOS' },
     { id: 'cantina', label: 'Cantina', icon: UtensilsCrossed, section: 'MÓDULOS OPERATIVOS' },
@@ -36,6 +37,13 @@ export const Sidebar = ({
     { id: 'rendicion', label: 'Rendición al Club', icon: Landmark, section: 'GESTIÓN INSTITUCIONAL' },
     { id: 'gastos', label: 'Gastos y Salidas', icon: Building2, section: 'GESTIÓN INSTITUCIONAL' },
   ];
+
+  // Restricciones estrictas para el rol Padre:
+  // 1. Ocultar completamente la sección de GESTIÓN INSTITUCIONAL (Sponsors, Rendición, Gastos)
+  // 2. En MÓDULOS OPERATIVOS, ocultar Entradas, Cantina y Gastos del Partido; habilitar únicamente Detalle de Partidos
+  if (isPadre) {
+    menuItems = menuItems.filter(item => item.id === 'dashboard' || item.id === 'partidos');
+  }
 
   if (isAdmin) {
     menuItems.push({
