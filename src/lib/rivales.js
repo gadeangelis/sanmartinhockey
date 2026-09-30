@@ -15,7 +15,7 @@ export const RIVALES = [
 ];
 
 export const getRivalInfo = (rivalVal) => {
-  if (!rivalVal) return { id: 'murialdo', name: 'Murialdo', image: '/escudos-rivales/murialdo.jpg' };
+  if (!rivalVal) return { id: 'murialdo', name: 'Murialdo', image: '/escudos-rivales/murialdo.png' };
   
   // Buscar por ID exacto
   let found = RIVALES.find(r => r.id === rivalVal);
@@ -23,7 +23,7 @@ export const getRivalInfo = (rivalVal) => {
     return {
       id: found.id,
       name: found.name,
-      image: `/escudos-rivales/${found.id}.jpg`
+      image: `/escudos-rivales/${found.id}.png`
     };
   }
 
@@ -33,7 +33,7 @@ export const getRivalInfo = (rivalVal) => {
     return {
       id: found.id,
       name: found.name,
-      image: `/escudos-rivales/${found.id}.jpg`
+      image: `/escudos-rivales/${found.id}.png`
     };
   }
 
@@ -44,13 +44,13 @@ export const getRivalInfo = (rivalVal) => {
     return {
       id: found.id,
       name: found.name,
-      image: `/escudos-rivales/${found.id}.jpg`
+      image: `/escudos-rivales/${found.id}.png`
     };
   }
 
   return {
     id: clean,
     name: rivalVal,
-    image: `/escudos-rivales/${clean}.jpg`
+    image: `/escudos-rivales/${clean}.png`
   };
 };

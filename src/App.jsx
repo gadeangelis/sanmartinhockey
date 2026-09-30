@@ -452,9 +452,9 @@ export function App() {
           marginBottom: '6px'
         }}>
           <img 
-            src="/escudo.jpg" 
+            src="/escudo.png" 
             alt="San Martín" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '17px' }} 
+            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '17px' }} 
           />
         </div>
         <div style={{

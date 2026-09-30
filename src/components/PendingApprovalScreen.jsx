@@ -36,7 +36,7 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
         {/* Escudo del Club */}
         <div style={{ marginBottom: '20px' }}>
           <img 
-            src="/escudo.jpg" 
+            src="/escudo.png" 
             alt="Escudo Hockey Club San Martín" 
             style={{
               width: '84px',

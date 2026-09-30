@@ -334,7 +334,7 @@ export const CantinaModule = ({ cantina, currentUser, onAddCantina, onDeleteCant
                         flexShrink: 0
                       }}>
                         <img
-                          src={`/escudos-rivales/${rival}.jpg`}
+                          src={`/escudos-rivales/${rival}.png`}
                           alt="Escudo Rival"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           style={{ width: '100%', height: '100%', objectFit: 'contain' }}
