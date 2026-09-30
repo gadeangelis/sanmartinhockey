@@ -13,7 +13,7 @@ export const RivalItem = ({ rival, subtitle = null, size = 28 }) => {
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: '6px',
-        background: '#ffffff',
+        background: 'transparent',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

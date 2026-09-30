@@ -326,20 +326,18 @@ export const CantinaModule = ({ cantina, currentUser, onAddCantina, onDeleteCant
                         width: '28px',
                         height: '28px',
                         borderRadius: '6px',
-                        background: '#ffffff',
+                        background: 'transparent',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         overflow: 'hidden',
-                        flexShrink: 0,
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)'
+                        flexShrink: 0
                       }}>
                         <img
                           src={`/escudos-rivales/${rival}.jpg`}
                           alt="Escudo Rival"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '1px' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                         />
                       </div>
                       <select

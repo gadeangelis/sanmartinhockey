@@ -176,7 +176,7 @@ export const GastosPartidoModule = ({ gastos, currentUser, onAddGasto, onDeleteG
                           <img
                             src={rivalInfo.image}
                             alt={rivalInfo.name}
-                            style={{ width: '26px', height: '26px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.2)', flexShrink: 0 }}
+                            style={{ width: '26px', height: '26px', objectFit: 'contain', flexShrink: 0 }}
                             onError={e => { e.target.style.display = 'none'; }}
                           />
                           <div>

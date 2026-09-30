@@ -131,15 +131,11 @@ function PartidoCard({ partido, onSelect }) {
             style={{
               width: '48px',
               height: '48px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '2px solid rgba(255,255,255,0.18)',
+              objectFit: 'contain',
               flexShrink: 0
             }}
             onError={e => {
-              e.target.style.background = 'rgba(255,255,255,0.1)';
-              e.target.style.border = '2px solid rgba(255,255,255,0.18)';
-              e.target.src = '';
+              e.target.style.display = 'none';
             }}
           />
           <div>
@@ -344,7 +340,7 @@ function QuickGastoModal({ partido, onAddGasto, onClose }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img src={rivalInfo.image} alt={rivalInfo.name}
-              style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.2)' }}
+              style={{ width: '36px', height: '36px', objectFit: 'contain' }}
               onError={e => e.target.style.display = 'none'} />
             <div>
               <h3 className="modal-title">Cargar Gasto — vs {rivalInfo.name}</h3>
@@ -461,7 +457,7 @@ function PartidoDetail({ partido, onBack, canManage, onAddGasto, onDeleteGasto, 
         <img
           src={rivalInfo.image}
           alt={rivalInfo.name}
-          style={{ width: '52px', height: '52px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.2)' }}
+          style={{ width: '52px', height: '52px', objectFit: 'contain' }}
           onError={e => e.target.style.display = 'none'}
         />
 
