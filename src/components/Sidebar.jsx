@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  LayoutGrid, 
-  Ticket, 
-  UtensilsCrossed, 
-  Award, 
-  Landmark, 
-  Receipt, 
-  UserCheck, 
+import {
+  LayoutGrid,
+  Ticket,
+  UtensilsCrossed,
+  Award,
+  Landmark,
+  Receipt,
+  UserCheck,
   Search,
   X,
   LogOut,
@@ -15,14 +15,14 @@ import {
   Building2
 } from 'lucide-react';
 
-export const Sidebar = ({ 
-  activeTab, 
-  setActiveTab, 
-  pendingCount = 0, 
-  currentUser, 
-  isMobileOpen, 
+export const Sidebar = ({
+  activeTab,
+  setActiveTab,
+  pendingCount = 0,
+  currentUser,
+  isMobileOpen,
   setIsMobileOpen,
-  onLogout 
+  onLogout
 }) => {
   const isAdmin = currentUser?.role === 'admin';
   const isPadre = currentUser?.role === 'padre';
@@ -70,18 +70,14 @@ export const Sidebar = ({
       <aside className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
         {/* Cabecera del Club */}
         <div className="sidebar-header">
-          <img 
-            src="/escudo-sanmartin.png" 
-            alt="Escudo San Martín" 
-            className="brand-logo-img"
-          />
+
           <div style={{ flex: 1 }}>
             <div className="brand-title">HOCKEY SAN MARTIN</div>
             <div className="brand-subtitle">A.C.S.M. • GESTIÓN</div>
           </div>
           {isMobileOpen && (
-            <button 
-              className="btn-icon-only" 
+            <button
+              className="btn-icon-only"
               onClick={() => setIsMobileOpen(false)}
               style={{ border: 'none', background: 'transparent' }}
             >
@@ -94,7 +90,7 @@ export const Sidebar = ({
         <div className="sidebar-search-box">
           <div className="search-input-wrapper">
             <Search size={15} className="search-icon" />
-            <input type="text" placeholder="Buscar módulo..." readOnly onClick={() => {}} />
+            <input type="text" placeholder="Buscar módulo..." readOnly onClick={() => { }} />
             <span className="search-shortcut">⌘K</span>
           </div>
         </div>
@@ -143,9 +139,9 @@ export const Sidebar = ({
                 {currentUser?.role === 'padre' && '👀 Padre (Lectura)'}
               </span>
             </div>
-            <button 
-              onClick={onLogout} 
-              className="btn-icon-only" 
+            <button
+              onClick={onLogout}
+              className="btn-icon-only"
               title="Cerrar sesión"
               style={{ padding: '6px', border: 'none', background: 'transparent' }}
             >
