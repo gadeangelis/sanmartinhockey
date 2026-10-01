@@ -443,7 +443,6 @@ export function App() {
           width: '74px',
           height: '74px',
           borderRadius: '20px',
-          background: '#ffffff',
           padding: '3px',
           display: 'flex',
           alignItems: 'center',
