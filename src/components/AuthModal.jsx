@@ -253,7 +253,6 @@ export const AuthModal = ({ onLoginSuccess }) => {
                 height: '90px',
                 borderRadius: '22px',
                 objectFit: 'cover',
-                background: '#ffffff',
                 padding: '3px',
                 boxShadow: '0 10px 25px rgba(229, 37, 42, 0.4)'
               }}
@@ -440,10 +439,10 @@ export const AuthModal = ({ onLoginSuccess }) => {
             type="submit"
             className="btn btn-primary"
             disabled={isSubmitting}
-            style={{ 
-              width: '100%', 
-              padding: '12px', 
-              marginTop: '6px', 
+            style={{
+              width: '100%',
+              padding: '12px',
+              marginTop: '6px',
               fontSize: '0.9rem',
               opacity: isSubmitting ? 0.75 : 1,
               cursor: isSubmitting ? 'not-allowed' : 'pointer'

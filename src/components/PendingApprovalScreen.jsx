@@ -35,16 +35,15 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
 
         {/* Escudo del Club */}
         <div style={{ marginBottom: '20px' }}>
-          <img 
-            src="/escudo-sanmartin.png" 
-            alt="Escudo Hockey Club San Martín" 
+          <img
+            src="/escudo-sanmartin.png"
+            alt="Escudo Hockey Club San Martín"
             style={{
               width: '84px',
               height: '84px',
               borderRadius: '20px',
               objectFit: 'cover',
               padding: '3px',
-              background: '#ffffff',
               boxShadow: '0 8px 24px rgba(229, 37, 42, 0.35)',
               margin: '0 auto'
             }}
@@ -101,20 +100,20 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Rol solicitado:</span>
-            <span style={{ 
-              fontSize: '0.82rem', 
-              fontWeight: 700, 
-              color: 'var(--club-red)', 
-              textTransform: 'uppercase' 
+            <span style={{
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              color: 'var(--club-red)',
+              textTransform: 'uppercase'
             }}>
               {currentUser?.role === 'padre' ? 'PADRE (Solo Lectura Partidos)' : 'DELEGADO (Solo Lectura Completo)'}
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Estado:</span>
-            <span style={{ 
-              fontSize: '0.78rem', 
-              fontWeight: 700, 
+            <span style={{
+              fontSize: '0.78rem',
+              fontWeight: 700,
               color: 'var(--color-warning)'
             }}>
               ⏳ Esperando autorización del Administrador
@@ -124,16 +123,16 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
 
         {/* Botones de Acción */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             style={{ width: '100%', padding: '12px' }}
             onClick={onRefresh}
           >
             <RefreshCw size={16} /> Comprobar si ya fue aprobada
           </button>
 
-          <button 
-            className="btn btn-secondary" 
+          <button
+            className="btn btn-secondary"
             style={{ width: '100%', padding: '12px' }}
             onClick={onLogout}
           >
@@ -149,7 +148,7 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
             <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
               ¿Eres el Administrador del Club? Puedes ingresar directamente para autorizar esta cuenta:
             </p>
-            <button 
+            <button
               className="btn btn-secondary"
               style={{
                 width: '100%',
