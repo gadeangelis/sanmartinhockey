@@ -64,7 +64,7 @@ export const EntradasModule = ({ entradas, currentUser, onAddEntrada, onDeleteEn
 
   // Permisos según el rol (Tesorero y Admin pueden crear/eliminar; Delegado y Padre son Solo Lectura)
   const canCreate = ['tesorero', 'admin'].includes(currentUser?.role);
-  const canDelete = ['tesorero', 'admin'].includes(currentUser?.role);
+  const canDelete = ['admin'].includes(currentUser?.role);
 
   // Actualizar un campo de un talonario específico
   const updateTalonario = (key, field, value) => {

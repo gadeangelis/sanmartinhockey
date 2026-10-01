@@ -35,7 +35,7 @@ export const CantinaModule = ({ cantina, currentUser, onAddCantina, onDeleteCant
 
   // Permisos (Tesorero y Admin pueden crear/eliminar; Delegado y Padre son Solo Lectura)
   const canCreate = ['tesorero', 'admin'].includes(currentUser?.role);
-  const canDelete = ['tesorero', 'admin'].includes(currentUser?.role);
+  const canDelete = ['admin'].includes(currentUser?.role);
 
   // Carga rápida de totales
   const handleTotalChange = (val) => {
