@@ -55,7 +55,8 @@ export const Navbar = ({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              objectFit: 'contain'
+              objectFit: 'cover',
+              padding: '1px'
             }}
           />
           <div className="breadcrumbs">

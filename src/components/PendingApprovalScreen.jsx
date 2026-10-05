@@ -42,8 +42,8 @@ export const PendingApprovalScreen = ({ currentUser, onRefresh, onLogout, onSwit
               width: '84px',
               height: '84px',
               borderRadius: '20px',
-              /*objectFit: 'cover',
-              padding: '3px',*/
+              objectFit: 'cover',
+              padding: '3px',
               boxShadow: '0 8px 24px rgba(229, 37, 42, 0.35)',
               margin: '0 auto'
             }}
